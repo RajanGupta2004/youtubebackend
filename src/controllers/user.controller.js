@@ -44,8 +44,13 @@ export const register = async (req, res) => {
         // console.log(" milter files details:", req.files)
 
         const avatarLocalPath = req.files?.avatar[0].path
-        const coverImageLocalPath = req.files?.coverImage[0].path
+        // const coverImageLocalPath = req.files?.coverImage[0].path
         // console.log("local path images ", avatarLocalPath, coverImageLocalPath)
+        let coverImageLocalPath
+        if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+            coverImageLocalPath = req.files?.coverImage[0].path
+
+        }
 
 
         // check avater local path
@@ -59,7 +64,7 @@ export const register = async (req, res) => {
         // check file upload on cloudinary
         const avatar = await uploadFileOnCloudinary(avatarLocalPath)
         const coverImage = await uploadFileOnCloudinary(coverImageLocalPath)
-        console.log("Cloudinary response", avatar, coverImage)
+        // console.log("Cloudinary response", avatar, coverImage)
 
         if (!avatar) {
             return res.status(400).json({
