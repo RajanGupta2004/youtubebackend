@@ -1,13 +1,18 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from 'fs'
+import dotenv from 'dotenv';
+dotenv.config();
 
 cloudinary.config({
 
         cloud_name: 'dpj2nvdh1', 
-        api_key: process.env.CLOUDINARY_API_KEY, 
-        api_secret: process.env.CLOUDINARY_SECRET_KEY // Click 'View API Keys' above to copy your API secret
+        api_key: process.env.CLOUDINARY_API_KEY , 
+        api_secret: process.env.CLOUDINARY_SECRET_KEY  // Click 'View API Keys' above to copy your API secret
 
 })
+
+
+
 
 
 export const uploadFileOnCloudinary = async (localfilePath) => {
@@ -19,9 +24,8 @@ export const uploadFileOnCloudinary = async (localfilePath) => {
        const response =  await cloudinary.uploader.upload(localfilePath , {
             resource_type:"auto"
         })
-
-        console.log("File uploaded successfull" , response.url)
-
+        fs.unlinkSync(localfilePath)
+        
         return response
         
     } catch (error) {

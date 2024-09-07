@@ -42,15 +42,15 @@ const userSchema = new mongoose.Schema(
         },
         refreshToken: {
             type: String,
-            required: true,
             trim: true
         },
 
-        watchHistory: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Videos"
-        }
-
+        watchHistory: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Videos"
+            }
+        ]
     }
 
     ,
