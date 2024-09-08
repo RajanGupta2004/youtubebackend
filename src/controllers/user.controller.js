@@ -1,6 +1,9 @@
 import { Users } from "../models/user.model.js"
 import { uploadFileOnCloudinary } from "../utils/Cloudinary.js"
 import { EncryptPassword } from "../utils/EncryptPassword.js"
+import jwt from "jsonwebtoken"
+import bcrypt from 'bcrypt'
+import GenerateToken from "../utils/GenerateToken.js"
 
 
 
@@ -105,6 +108,89 @@ export const register = async (req, res) => {
 
     } catch (error) {
         console.log("User Register Error", error)
+
+    }
+}
+
+
+
+export const login = async (req, res) => {
+    // get email and password
+    // check email and password send from user
+    // find user in dataase
+    // compare password
+    // generate jwt token access and refresh 
+    // set token into cookies
+    // send res
+    try {
+
+        const { email, username, password } = req.body;
+
+        if (!email || !username || !password) {
+            return res.status(409).json({
+                success: false,
+                message: "All field are required...."
+            })
+        }
+
+        const existingUser = await Users.findOne({ $or: [{ email }, { username }] })
+        // console.log(existingUser)
+        if (!existingUser) {
+            return res.status(404).json({
+                success: false,
+                message: "Your are not registed user....."
+            })
+        }
+
+        const passwordMatch = await bcrypt.compare(password, existingUser.password)
+        // console.log("Ismatch", passwordMatch)
+        if (!passwordMatch) {
+            return res.status(409).json({
+                success: false,
+                message: "Wronge password..."
+            })
+        }
+
+        // access token and refreshtoken
+        const { accessToken, refreshToken } = await GenerateToken(existingUser)
+
+        // set refreshtoken into database
+
+        existingUser.refreshToken = refreshToken
+        existingUser.save()
+
+
+        const loggedInUser = await Users.findById(existingUser._id).select("-password -refreshToken")
+        if (!loggedInUser) {
+            return res.status(500).json({
+                success: false,
+                message: "Something went wronge..."
+            })
+        }
+
+        // set token into cookies
+        const options = {
+            httpOnly: true,       // Prevents client-side JavaScript from accessing the cookie
+            secure: true,
+        }
+
+        return res.status(200).cookie('accessToken', accessToken, options).cookie("refreshToken", refreshToken, options).json({
+            success: true,
+            message: "Login successfull...",
+            loggedInUser,
+            accessToken,
+            refreshToken
+        })
+
+
+
+
+    } catch (error) {
+        console.log("ERROR in login", error)
+        return res.status(500).json({
+            success: false,
+            message: "Something went wronge...."
+        })
 
     }
 }

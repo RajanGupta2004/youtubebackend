@@ -11,7 +11,6 @@ const EncryptPassword = async (password) => {
         return hashedPassword
 
 
-
     } catch (error) {
         console.log("Error in password Encryption", error)
 
@@ -19,4 +18,8 @@ const EncryptPassword = async (password) => {
 }
 
 
+
+
 export { EncryptPassword }
+
+
