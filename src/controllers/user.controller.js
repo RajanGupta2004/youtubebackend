@@ -196,3 +196,36 @@ export const login = async (req, res) => {
 }
 
 
+export const logout = async (req, res) => {
+    try {
+
+        // console.log(req.user._id, 202)
+        const updatedUser = await Users.findByIdAndUpdate(req.user._id, { $unset: { refreshToken: "" } }, { new: true })
+        // console.log(updatedUser, 2004)
+
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+
+        return res.status(200)
+            .clearCookie("accessToken", options)
+            .clearCookie("refreshToken", options)
+            .json({
+                success: true,
+                message: "User logged out"
+            })
+
+
+
+    } catch (error) {
+        console.log("Logout ERROR", error)
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong.."
+        })
+
+    }
+}
+
+

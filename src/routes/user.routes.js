@@ -1,6 +1,7 @@
 import exppress from 'express'
-import { login, register } from '../controllers/user.controller.js'
+import { login, logout, register } from '../controllers/user.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
+import { verifyToken } from '../middlewares/auth.middleware.js'
 
 
 const router = exppress.Router()
@@ -8,6 +9,10 @@ const router = exppress.Router()
 
 router.post('/register', upload.fields([{ name: "avatar", maxCount: 1 }, { name: "coverImage", maxCount: 1 }]), register)
 router.post("/login", login)
+
+// procted routes
+
+router.post("/logout", verifyToken, logout)
 
 
 
