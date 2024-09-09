@@ -1,5 +1,5 @@
 import exppress from 'express'
-import { login, logout, register } from '../controllers/user.controller.js'
+import { login, logout, refreshToken, register } from '../controllers/user.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
 import { verifyToken } from '../middlewares/auth.middleware.js'
 
@@ -13,6 +13,7 @@ router.post("/login", login)
 // procted routes
 
 router.post("/logout", verifyToken, logout)
+router.post("/refreshtoken", refreshToken)
 
 
 

@@ -229,3 +229,70 @@ export const logout = async (req, res) => {
 }
 
 
+
+export const refreshToken = async (req, res) => {
+    try {
+
+        // get token from cookies
+        const incommingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+        // console.log("incommingRefreshToken", incommingRefreshToken)
+
+        if (!incommingRefreshToken) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorised request"
+            })
+        }
+
+        // verify token or decode
+
+        const decodedToken = jwt.verify(incommingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+        // console.log("decodedToken", decodedToken)
+
+        if (!decodedToken) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid token "
+            })
+        }
+
+        // find user based on decoded token 
+
+        const user = await Users.findById(decodedToken?._id)
+        // console.log("user", user)
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid access token.."
+            })
+        }
+
+
+        // compare the both token incomming refreshToken and refreshToken store in DB
+
+        if (incommingRefreshToken !== user.refreshToken) {
+            return res.status(401).json({
+                success: false,
+                message: "Refresh token is expired or used"
+            })
+
+        }
+
+        // generate new access token
+        const { accessToken, refreshToken } = await GenerateToken(user)
+
+        // console.log("accessToken", accessToken)
+        // console.log("refreshToken", refreshToken)
+
+        return res.status(200).cookie('accessToken', accessToken).cookie('refreshToken', refreshToken).json({
+            success: true,
+            message: "new accesToken generated successfull..."
+        })
+
+    } catch (error) {
+        console.log("Refresh Token ERROR ", error)
+
+    }
+}
+
+
