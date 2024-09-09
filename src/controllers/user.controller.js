@@ -316,3 +316,53 @@ export const getCurrrentUser = async (req, res) => {
 }
 
 
+
+export const changePassword = async (req, res) => {
+    try {
+
+        // get data from body
+        const { oldPassword, newPassword } = req.body
+        if (!oldPassword || !newPassword) {
+            return res.status(409).json({
+                success: false,
+                message: "All fields are required..."
+            })
+        }
+
+        // find user by Id because user is loged in
+
+        const user = await Users.findById(req.user?._id)
+
+        // check password in database
+        const isCorrectPassword = await bcrypt.compare(oldPassword, user.password)
+        if (!isCorrectPassword) {
+            return res.status(409).json({
+                success: false,
+                message: "Wronge password..."
+            })
+        }
+
+        // encrypt the new password
+        const hashedPassword = await EncryptPassword(newPassword)
+        // console.log("hashedPassword", hashedPassword)
+
+        // save the new password
+        user.password = hashedPassword
+        await user.save()
+
+        return res.status(200).json({
+            success: true,
+            message: "password change successfully...."
+        })
+
+    } catch (error) {
+        console.log("Error in Change Password", error)
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong....."
+        })
+
+    }
+}
+
+
