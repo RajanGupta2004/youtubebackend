@@ -12,7 +12,7 @@ export const verifyToken = async (req, res, next) => {
         // console.log("Cookies", req.cookies)
 
         const token = req.cookies.accessToken || req.header("Authorization").replace("Bearer ", "")
-        console.log(token)
+        // console.log(token)
 
 
         if (!token) {

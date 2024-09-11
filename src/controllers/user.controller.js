@@ -366,3 +366,134 @@ export const changePassword = async (req, res) => {
 }
 
 
+export const updateAccountDetails = async (req, res) => {
+    try {
+
+        const { fullName, email } = req.body
+
+        if (!(fullName || email)) {
+            return res.status(409).json({
+                success: false,
+                message: "All field are required"
+            })
+        }
+
+        const user = await Users.findByIdAndUpdate(req.user?._id, { $set: { fullName: fullName, email: email } }, { new: true }).select("-password")
+        return res.status(200).json({
+            success: false,
+            message: "Account details updated successfully",
+            user
+        })
+
+
+
+    } catch (error) {
+        console.log("ERROR in update Account", error)
+
+    }
+}
+
+
+export const updateAvatarImage = async (req, res) => {
+    try {
+
+        const avatarLocalPath = req.file?.path
+
+
+        if (!avatarLocalPath) {
+            return res.status(409).json({
+                success: false,
+                message: "file upload ir required..."
+            })
+
+        }
+
+        const avatar = await uploadFileOnCloudinary(avatarLocalPath)
+        if (!avatar) {
+            return res.status(500).json({
+                success: false,
+                message: "Something went wrong on avatar image upload on cloudinary"
+            })
+        }
+        // console.log("avatar url", avatar.url)
+        // const coverImageLocalPath = req.file?.coverImage
+
+        const user = await Users.findByIdAndUpdate(req.user?._id, { $set: { avatar: avatar?.url } }, { new: true }).select("-password")
+        if (!user) {
+            return res.status(500).json({
+                success: false,
+                message: "Something went wrong on file upload....."
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Avatar Image  updated successfully.... "
+        })
+
+
+
+
+    } catch (error) {
+        console.log("ERROR in update avatar", error)
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong..."
+        })
+
+    }
+}
+
+
+export const updateCoverImage = async (req, res) => {
+    try {
+
+        const coverImageLocalPath = req.file?.path
+
+        if (!coverImageLocalPath) {
+            return res.status(409).json({
+                success: false,
+                message: "cover image file is required....."
+            })
+
+        }
+
+        const coverImage = await uploadFileOnCloudinary(coverImageLocalPath)
+
+        if (!coverImage) {
+            return res.status(500).json({
+                success: false,
+                message: "something went wrong on coverImage update on cloudinary"
+            })
+        }
+
+        // console.log(coverImage.url)
+
+
+        const user = await Users.findByIdAndUpdate(req.user?._id, { $set: { coverImage: coverImage.url } }, { new: true }).select("-password")
+
+        if (!user) {
+            return res.status(500).json({
+                success: false,
+                message: "Something went wrong on coverImage update..."
+            })
+
+        }
+
+
+        return res.status(200).json({
+            success: false,
+            message: "cover Image updated successfully....."
+        })
+
+    } catch (error) {
+        console.log("Error on update coverImage ", error)
+        return res.status(500).json({
+            success: false,
+            message: "Something went wronge...."
+        })
+
+    }
+}
+
+

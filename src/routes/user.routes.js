@@ -1,5 +1,5 @@
 import exppress from 'express'
-import { changePassword, getCurrrentUser, login, logout, refreshToken, register } from '../controllers/user.controller.js'
+import { changePassword, getCurrrentUser, login, logout, refreshToken, register, updateAvatarImage, updateCoverImage } from '../controllers/user.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
 import { verifyToken } from '../middlewares/auth.middleware.js'
 
@@ -16,6 +16,8 @@ router.post("/logout", verifyToken, logout)
 router.post("/refreshtoken", refreshToken)
 router.post("/current-user", verifyToken, getCurrrentUser)
 router.post("/change-password", verifyToken, changePassword)
+router.post("/update-avatar", verifyToken, upload.single('avatar'), updateAvatarImage)
+router.post("/update-coverImage", verifyToken, upload.single("coverImage"), updateCoverImage)
 
 
 
